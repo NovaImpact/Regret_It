@@ -1,9 +1,12 @@
 package com.example.regret_it;
 
 
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Queue;
 
 public class Server{
+    public static OutQueue theQueue = new OutQueue();
     static ArrayList<CommunicationConnection> allConnections = new ArrayList<>();
 
     public static void main(String[] args)  {
