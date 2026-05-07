@@ -8,6 +8,8 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -19,8 +21,12 @@
     <top>
         <HBox fx:id="topBar" alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 5 20; -fx-border-color: #edeff1; -fx-border-width: 0 0 1 0;">
             <HBox alignment="CENTER_LEFT" spacing="8">
-                <Label style="-fx-font-size: 28;" text="😬" />
-                <Label style="-fx-text-fill: #1c1c1c; -fx-font-weight: bold; -fx-font-size: 18;" text="RegretIt" />
+            <ImageView fitHeight="214.0" fitWidth="225.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../../kermit_reddit_logo_blue_sad.png" />
+               </image>
+            </ImageView>
+                <Label prefHeight="27.0" prefWidth="86.0" style="-fx-text-fill: #1c1c1c; -fx-font-weight: bold; -fx-font-size: 18;" text="RegretIt" />
             </HBox>
 
             <Region prefWidth="40" />
@@ -54,7 +60,7 @@
                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#FilterThreads" style="-fx-background-color: transparent;" text="r/Money" />
             </VBox>
 
-            <Region VBox.vgrow="ALWAYS" />
+            <Region prefHeight="305.0" prefWidth="210.0" VBox.vgrow="ALWAYS" />
 
             <VBox spacing="10" style="-fx-background-color: #f6f7f8; -fx-padding: 12; -fx-background-radius: 4; -fx-border-color: #edeff1;">
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #1c1c1c;" text="Think before you post!" />
@@ -104,7 +110,7 @@
                 <StackPane.margin><Insets bottom="30" right="30" /></StackPane.margin>
             </Button>
 
-            <StackPane fx:id="postPopupOverlay" style="-fx-background-color: rgba(28,28,28,0.9);" visible="false">
+            <StackPane fx:id="postPopupOverlay" style="-fx-background-color: rgba(28,28,28,0.9);">
                 <VBox maxHeight="500" maxWidth="600" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;">
                     <HBox alignment="CENTER_LEFT">
                         <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Create a post" />
@@ -125,7 +131,7 @@
     </center>
 
     <right>
-        <VBox prefWidth="310" spacing="15" style="-fx-background-color: transparent;">
+        <VBox prefWidth="310" spacing="15" style="-fx-background-color: #edeff1;">
             <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
             <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 4; -fx-border-color: #ccc;">
                 <HBox style="-fx-background-color: #0079D3; -fx-padding: 10; -fx-background-radius: 4 4 0 0;">
