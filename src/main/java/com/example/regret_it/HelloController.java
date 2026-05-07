@@ -12,6 +12,9 @@ import java.util.Scanner;
 public class HelloController {
     public TextField username;
 
+    private ObjectOutputStream myObjOutput;
+    private ObjectInputStream myObjInput;
+
     public void initialize() {
 
     }
@@ -20,8 +23,8 @@ public class HelloController {
         try {
             Socket ourSocket = new Socket("10.69.40.225", 67);
 
-            ObjectOutputStream myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
-            ObjectInputStream myObjInput = new ObjectInputStream(ourSocket.getInputStream());
+            myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
+            myObjInput = new ObjectInputStream(ourSocket.getInputStream());
             CommunicationConnection newConnection = new CommunicationConnection(username.getText(), ourSocket, myObjInput, myObjOutput, null);
             CommunicationIn myCommunicationIn = new CommunicationIn(null, newConnection);
             Thread communicationInThread = new Thread(myCommunicationIn);
@@ -33,5 +36,13 @@ public class HelloController {
         } catch (Exception ex) {
             System.out.println("Socket failed: " + ex);
         }
+    }
+
+    public void openChannel() {
+
+    }
+
+    public ObjectOutputStream getMyObjOutput() {
+        return myObjOutput;
     }
 }
