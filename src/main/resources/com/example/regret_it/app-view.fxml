@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="800" prefWidth="1200" style="-fx-background-color: #DAE0E6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.regret_it.RegretController">
+<BorderPane prefHeight="800" prefWidth="1200" style="-fx-background-color: #DAE0E6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.regret_it.HelloController">
 
     <top>
         <HBox fx:id="topBar" alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 5 20; -fx-border-color: #edeff1; -fx-border-width: 0 0 1 0;">

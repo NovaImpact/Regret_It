@@ -24,7 +24,7 @@ public class ServerConnection implements Runnable{
     @Override
     public void run() {
         try {
-            ServerSocket myServerSocket = new ServerSocket(67);
+            ServerSocket myServerSocket = new ServerSocket(12);
             while (!Thread.currentThread().isInterrupted()) {
                 System.out.println("Server ready at port: " + myServerSocket.getLocalPort());
                 Socket newSocket = myServerSocket.accept();

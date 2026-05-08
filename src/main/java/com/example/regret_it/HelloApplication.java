@@ -17,9 +17,4 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.show();
     }
-
-//    public void stop(Stage stage) throws Exception {
-//        TextField username = (TextField) stage.getScene().lookup("#username");
-//
-//    }
 }
