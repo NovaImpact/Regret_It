@@ -4,28 +4,17 @@ import java.time.LocalDateTime;
 
 public class CommunicationIn implements Runnable {
     CommunicationConnection myConnection;
-    HelloController guiController;
+    RegretController guiController;
 
-    public CommunicationIn(HelloController guiController, CommunicationConnection myConnection) {
+    public CommunicationIn(RegretController guiController, CommunicationConnection myConnection) {
         this.guiController = guiController;
         this.myConnection = myConnection;
     }
 
-    public CommunicationConnection getMyConnection() {
-        return myConnection;
-    }
-
-    public void setMyConnection(CommunicationConnection myConnection) {
-        this.myConnection = myConnection;
-    }
-
-    public HelloController getGuiController() {
-        return guiController;
-    }
-
-    public void setGuiController(HelloController guiController) {
-        this.guiController = guiController;
-    }
+    public CommunicationConnection getMyConnection() { return myConnection; }
+    public void setMyConnection(CommunicationConnection myConnection) { this.myConnection = myConnection; }
+    public RegretController getGuiController() { return guiController; }
+    public void setGuiController(RegretController guiController) { this.guiController = guiController; }
 
     @Override
     public void run() {
@@ -37,14 +26,21 @@ public class CommunicationIn implements Runnable {
                 newMessage = (Message) myConnection.getInStream().readObject();
                 newChannel = (Channel) myConnection.getInStream().readObject();
             } catch (Exception ex) {
-                System.out.println("CommunicationIn failed connection with:" + myConnection.getName() + ": " + ex);
+                System.out.println("CommunicationIn failed connection with: "
+                        + myConnection.getName() + ": " + ex);
+                stayConnected = false;
             }
 
             if (newMessage != null) {
                 System.out.println("CommunicationIn from: " + myConnection.getName() + ": " + newMessage);
                 newMessage.setTimeStamp(LocalDateTime.now());
-                if (guiController != null) {
 
+                if (guiController != null) {
+                    guiController.onMessageReceived(newMessage);
+                }
+
+                if (newMessage.getMode() == 3) {
+                    stayConnected = false;
                 }
 
                 if (newMessage.getMode() == 1) {
@@ -55,7 +51,6 @@ public class CommunicationIn implements Runnable {
                 }
             }
         }
-
         System.out.println("CommunicationIn bye: " + myConnection.getName());
     }
 }
