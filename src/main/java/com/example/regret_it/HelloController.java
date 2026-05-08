@@ -63,7 +63,7 @@ public class HelloController {
 
     public void onSetUsername() {
         try {
-            Socket ourSocket = new Socket("localhost", 12);
+            Socket ourSocket = new Socket("10.69.40.225", 12);
 
             myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
             myObjInput = new ObjectInputStream(ourSocket.getInputStream());
