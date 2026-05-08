@@ -7,17 +7,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerConnection implements Runnable{
-    HelloController guiController;
+    RegretController guiController;
 
-    public ServerConnection(HelloController guiController) {
+    public ServerConnection(RegretController guiController) {
         this.guiController = guiController;
     }
 
-    public HelloController getGuiController() {
+    public RegretController getGuiController() {
         return guiController;
     }
 
-    public void setGuiController(HelloController guiController) {
+    public void setGuiController(RegretController guiController) {
         this.guiController = guiController;
     }
 

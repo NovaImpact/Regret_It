@@ -29,6 +29,7 @@ public class RegretController {
     @FXML private ImageView logoImageView;
 
     private ObjectOutputStream myObjOutput;
+    private ObjectInputStream myObjInput;
     private String currentUsername = "anonymous";
     private ArrayList<Channel> channels = new ArrayList<>();
 
@@ -54,25 +55,22 @@ public class RegretController {
 
     private void connectToServer() {
         try {
-            Socket socket = new Socket("127.0.0.1", 67);
-            myObjOutput = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream myObjInput = new ObjectInputStream(socket.getInputStream());
+            Socket ourSocket = new Socket("10.69.40.225", 12);
 
-            CommunicationConnection connection = new CommunicationConnection(
-                    currentUsername, socket, myObjInput, myObjOutput, null);
+            myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
+            myObjInput = new ObjectInputStream(ourSocket.getInputStream());
+            CommunicationConnection newConnection = new CommunicationConnection(usernameInputField.getText(), ourSocket, myObjInput, myObjOutput, null);
+            CommunicationIn myCommunicationIn = new CommunicationIn(null, newConnection);
+            Thread communicationInThread = new Thread(myCommunicationIn);
+            communicationInThread.start();
 
-            CommunicationIn commIn = new CommunicationIn(this, connection);
-            Thread t = new Thread(commIn);
-            t.setDaemon(true);
-            t.start();
-
-            Message hello = new Message(currentUsername, "Hello",
-                    null, null, null, null, null, 1);
-            myObjOutput.writeObject(hello);
+            Message message1 = new Message(usernameInputField.getText(),"Hello",null,null, null, null, null, 1);
+            myObjOutput.writeObject(message1);
             myObjOutput.flush();
-
+            usernamePopupOverlay.setVisible(false);
+            usernamePopupOverlay.setDisable(true);
         } catch (Exception ex) {
-            System.out.println("Connect failed: " + ex);
+            System.out.println("Socket failed: " + ex);
         }
     }
 
