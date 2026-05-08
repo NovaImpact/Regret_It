@@ -74,7 +74,6 @@ public class Message implements Serializable {
         this.timeStamp = timeStamp;
     }
 
-
     public Channel getChannel() {
         return channel;
     }

@@ -32,8 +32,10 @@ public class CommunicationIn implements Runnable {
         boolean stayConnected = true;
         while (stayConnected && !Thread.currentThread().isInterrupted()) {
             Message newMessage = null;
+            Channel newChannel = null;
             try {
                 newMessage = (Message) myConnection.getInStream().readObject();
+                newChannel = (Channel) myConnection.getInStream().readObject();
             } catch (Exception ex) {
                 System.out.println("CommunicationIn failed connection with:" + myConnection.getName() + ": " + ex);
             }
@@ -43,6 +45,13 @@ public class CommunicationIn implements Runnable {
                 newMessage.setTimeStamp(LocalDateTime.now());
                 if (guiController != null) {
 
+                }
+
+                if (newMessage.getMode() == 1) {
+                    String newClientName = newMessage.getUser();
+                    myConnection.setName(newClientName);
+                } else if (newMessage.getMode() == 2  && newMessage.getMode() == 3) {
+                    Server.theQueue.put(newMessage);
                 }
             }
         }

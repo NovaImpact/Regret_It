@@ -14,14 +14,12 @@ public class HelloController {
     public StackPane usernamePopupOverlay;
     public TextField usernameInputField;
 
+
+
     private ObjectOutputStream myObjOutput;
     private ObjectInputStream myObjInput;
 
     public void initialize() {
-
-    }
-
-    public void openChannel() {
 
     }
 

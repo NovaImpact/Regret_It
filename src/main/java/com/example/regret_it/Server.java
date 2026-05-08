@@ -7,6 +7,7 @@ import java.util.Queue;
 
 public class Server{
     public static OutQueue theQueue = new OutQueue();
+    public static ChannelQueue chQueue = new ChannelQueue();
     static ArrayList<CommunicationConnection> allConnections = new ArrayList<>();
 
     public static void main(String[] args)  {
