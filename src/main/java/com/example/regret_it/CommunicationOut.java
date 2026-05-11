@@ -8,15 +8,23 @@ public class CommunicationOut implements Runnable{
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             Message message = Server.theQueue.get();
-            while (message == null) {
+            Channel channel = Server.chQueue.get();
+            while (message == null || channel == null) {
                 message = Server.theQueue.get();
+                channel = Server.chQueue.get();
             }
             ArrayList<CommunicationConnection> connectionsToDisconnect = new ArrayList<>();
             for (CommunicationConnection eachConnection : Server.allConnections) {
                 try {
-                    eachConnection.getOutStream().writeObject(message);
-                    eachConnection.getOutStream().flush();
-                    System.out.println("CommunicationOut  to: " + eachConnection.getName() + ": " + message);
+                    if (channel == null) {
+                        eachConnection.getOutStream().writeObject(message);
+                        eachConnection.getOutStream().flush();
+                        System.out.println("CommunicationOut  to: " + eachConnection.getName() + ": " + message);
+                    } else if (message == null) {
+                        eachConnection.getOutStream().writeObject(channel);
+                        eachConnection.getOutStream().flush();
+                        System.out.println("CommunicationOut  to: " + eachConnection.getName() + ": " + channel);
+                    }
 
                     if (message.getUser().equalsIgnoreCase(eachConnection.getName()) && message.getMode() == 3){
                         connectionsToDisconnect.add(eachConnection);

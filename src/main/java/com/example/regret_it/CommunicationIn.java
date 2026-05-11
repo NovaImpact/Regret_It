@@ -50,6 +50,15 @@ public class CommunicationIn implements Runnable {
                     Server.theQueue.put(newMessage);
                 }
             }
+
+            if (newChannel != null) {
+                System.out.println("CommunicationIn from: " + myConnection.getName() + ": " + newChannel);
+
+                if (guiController != null) {
+                    guiController.onThreadReceived(newChannel);
+                }
+                Server.chQueue.put(newChannel);
+            }
         }
         System.out.println("CommunicationIn bye: " + myConnection.getName());
     }
