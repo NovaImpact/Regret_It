@@ -23,8 +23,13 @@ public class CommunicationIn implements Runnable {
             Message newMessage = null;
             Channel newChannel = null;
             try {
-                newMessage = (Message) myConnection.getInStream().readObject();
-                newChannel = (Channel) myConnection.getInStream().readObject();
+                Object obj = myConnection.getInStream().readObject();
+
+                if (obj instanceof Message) {
+                    newMessage = (Message) obj;
+                } else if (obj instanceof Channel) {
+                    newChannel = (Channel) obj;
+                }
             } catch (Exception ex) {
                 System.out.println("CommunicationIn failed connection with: "
                         + myConnection.getName() + ": " + ex);

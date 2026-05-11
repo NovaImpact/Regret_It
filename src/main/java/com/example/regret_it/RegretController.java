@@ -55,7 +55,7 @@ public class RegretController {
 
     private void connectToServer() {
         try {
-            Socket ourSocket = new Socket("10.69.40.225", 12);
+            Socket ourSocket = new Socket("10.69.40.225", 5528);
 
             myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
             myObjInput = new ObjectInputStream(ourSocket.getInputStream());
@@ -358,4 +358,5 @@ public class RegretController {
     @FXML private void Upvote()        { System.out.println("Upvote"); }
     @FXML private void Downvote()      { System.out.println("Downvote"); }
     @FXML private void UploadMedia()   { System.out.println("Upload media"); }
+    @FXML public void onThreadReceived(Channel channel) { System.out.println("Thread Received"); }
 }
