@@ -8,7 +8,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -32,6 +34,11 @@ public class RegretController {
     private ObjectInputStream myObjInput;
     private String currentUsername = "anonymous";
     private ArrayList<Channel> channels = new ArrayList<>();
+
+    private FileChooser fileChooser = new FileChooser();
+    private File selectedFile;
+
+    private Channel currentChannel = null;
 
     @FXML
     public void initialize() {
@@ -357,6 +364,15 @@ public class RegretController {
     @FXML private void OpenThread()    { System.out.println("Open thread"); }
     @FXML private void Upvote()        { System.out.println("Upvote"); }
     @FXML private void Downvote()      { System.out.println("Downvote"); }
-    @FXML private void UploadMedia()   { System.out.println("Upload media"); }
+    @FXML private void UploadMedia()   {
+        fileChooser.setTitle("Open Resource File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Media Files", "*.png", "*.jpg", "*.jpeg", "*.mp3", "*.mp2")
+        );
+        if (selectedFile != null) {
+
+        }
+        selectedFile = fileChooser.showOpenDialog(null);
+    }
     @FXML public void onThreadReceived(Channel channel) { System.out.println("Thread Received"); }
 }
