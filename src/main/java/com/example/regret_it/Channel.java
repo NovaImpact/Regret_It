@@ -70,7 +70,7 @@ public class Channel implements Serializable {
     @Override
     public String toString() {
         return "Channel{" +
-                "message=" + message +
+                message +
                 ", heading='" + heading + '\'' +
                 ", responses=" + responses +
                 ", upVote=" + upVote +
