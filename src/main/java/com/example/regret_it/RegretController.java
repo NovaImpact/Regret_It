@@ -6,12 +6,15 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,6 +36,9 @@ public class RegretController {
     private String currentUsername = "anonymous";
     private final Map<String, HBox> postCardMap = new HashMap<>();
     private final Map<String, Label> voteLabels = new HashMap<>();
+
+    private FileChooser fileChooser = new FileChooser();
+    private File selectedFile;
 
     @FXML
     public void initialize() {
@@ -57,7 +63,7 @@ public class RegretController {
 
     private void connectToServer() {
         try {
-            Socket ourSocket = new Socket("127.0.0.1", 5528);
+            Socket ourSocket = new Socket("10.69.40.225", 5567);
             ObjectOutputStream out = new ObjectOutputStream(ourSocket.getOutputStream());
             out.flush();
             ObjectInputStream in = new ObjectInputStream(ourSocket.getInputStream());
@@ -199,9 +205,9 @@ public class RegretController {
         Thread t = new Thread(() -> {
             try {
                 Message msg = new Message(currentUsername, combinedText, LocalDateTime.now(), null, 2);
-                msg.setPostId(postId);
+                Channel channel = new Channel(msg, heading, new ArrayList<Message>(), 0, 0, new ArrayList<String>(), postId, selectedFile);
                 synchronized (myObjOutput) {
-                    myObjOutput.writeObject(msg);
+                    myObjOutput.writeObject(channel);
                     myObjOutput.flush();
                 }
             } catch (Exception ex) {
@@ -212,6 +218,7 @@ public class RegretController {
         t.start();
 
         onClosePost();
+        selectedFile = null;
     }
 
     @FXML private void onOpenPostPopup() { postPopupOverlay.setVisible(true); }
@@ -227,5 +234,11 @@ public class RegretController {
     @FXML private void OpenThread() {}
     @FXML private void Upvote() {}
     @FXML private void Downvote() {}
-    @FXML private void UploadMedia() {}
+    @FXML private void UploadMedia() {
+        fileChooser.setTitle("Open Resource File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Media Files", "*.png", "*.jpg", "*.jpeg", "*.mp2", "*.mp3")
+        );
+        selectedFile = fileChooser.showOpenDialog(null);
+    }
 }

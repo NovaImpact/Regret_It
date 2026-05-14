@@ -1,5 +1,6 @@
 package com.example.regret_it;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -13,8 +14,9 @@ public class Channel implements Serializable {
     private int downVote;
     private ArrayList<String> tags = new ArrayList<>();
     private String postId;
+    private File file;
 
-    public Channel(Message message, String heading, ArrayList<Message> responses, int upVote, int downVote, ArrayList<String> tags, String postId) {
+    public Channel(Message message, String heading, ArrayList<Message> responses, int upVote, int downVote, ArrayList<String> tags, String postId, File file) {
         this.message = message;
         this.heading = heading;
         this.responses = responses != null ? responses : new ArrayList<>();
@@ -22,6 +24,7 @@ public class Channel implements Serializable {
         this.downVote = downVote;
         this.tags = tags != null ? tags : new ArrayList<>();
         this.postId = postId;
+        this.file = file;
     }
 
     public Message getMessage() { return message; }
@@ -38,11 +41,27 @@ public class Channel implements Serializable {
     public void setTags(ArrayList<String> tags) { this.tags = tags; }
     public String getPostId() { return postId; }
     public void setPostId(String postId) { this.postId = postId; }
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
 
     public int getScore() { return upVote - downVote; }
 
     @Override
     public String toString() {
-        return "Channel{heading='" + heading + "', upVote=" + upVote + ", downVote=" + downVote + '}';
+        return "Channel{" +
+                "message=" + message +
+                ", heading='" + heading + '\'' +
+                ", responses=" + responses +
+                ", upVote=" + upVote +
+                ", downVote=" + downVote +
+                ", tags=" + tags +
+                ", postId='" + postId + '\'' +
+                ", file=" + file +
+                '}';
     }
 }

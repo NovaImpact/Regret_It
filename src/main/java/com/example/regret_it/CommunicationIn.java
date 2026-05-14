@@ -37,19 +37,18 @@ public class CommunicationIn implements Runnable {
                     if (isServerSide()) {
                         if (newMessage.getMode() == 1) {
                             myConnection.setName(newMessage.getUser());
-
-                        } else if (newMessage.getMode() == 2) {
-                            Channel newChannel = new Channel(
-                                    newMessage,
-                                    newMessage.getMessage(),
-                                    null, 0, 0, null,
-                                    newMessage.getPostId()
-                            );
-                            synchronized (Server.allChannels) {
-                                Server.allChannels.add(newChannel);
-                            }
-                            Server.saveChannels();
-                            Server.chQueue.put(newChannel);
+//                        } else if (newMessage.getMode() == 2) {
+//                            Channel newChannel = new Channel(
+//                                    newMessage,
+//                                    newMessage.getMessage(),
+//                                    null, 0, 0, null,
+//                                    newMessage.getPostId()
+//                            );
+//                            synchronized (Server.allChannels) {
+//                                Server.allChannels.add(newChannel);
+//                            }
+//                            Server.saveChannels();
+//                            Server.chQueue.put(newChannel);
 
                         } else if (newMessage.getMode() == 3) {
                             stayConnected = false;
@@ -70,7 +69,18 @@ public class CommunicationIn implements Runnable {
 
                 } else if (obj instanceof Channel) {
                     Channel newChannel = (Channel) obj;
+                    Message newMessage = newChannel.getMessage();
+                    if (newMessage.getTimeStamp() == null) {
+                        newMessage.setTimeStamp(LocalDateTime.now());
+                    }
                     System.out.println("CommunicationIn from: " + myConnection.getName() + ": " + newChannel);
+
+                    synchronized (Server.allChannels) {
+                        Server.allChannels.add(newChannel);
+                    }
+
+                    Server.saveChannels();
+                    Server.chQueue.put(newChannel);
 
                     if (guiController != null) {
                         guiController.onChannelReceived(newChannel);
