@@ -6,20 +6,15 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerConnection implements Runnable{
+public class ServerConnection implements Runnable {
     RegretController guiController;
 
     public ServerConnection(RegretController guiController) {
         this.guiController = guiController;
     }
 
-    public RegretController getGuiController() {
-        return guiController;
-    }
-
-    public void setGuiController(RegretController guiController) {
-        this.guiController = guiController;
-    }
+    public RegretController getGuiController() { return guiController; }
+    public void setGuiController(RegretController guiController) { this.guiController = guiController; }
 
     @Override
     public void run() {
@@ -29,17 +24,30 @@ public class ServerConnection implements Runnable{
                 System.out.println("Server ready at port: " + myServerSocket.getLocalPort());
                 Socket newSocket = myServerSocket.accept();
 
-                ObjectInputStream myObjInput = new ObjectInputStream(newSocket.getInputStream());
                 ObjectOutputStream myObjOutput = new ObjectOutputStream(newSocket.getOutputStream());
+                myObjOutput.flush();
+                ObjectInputStream myObjInput = new ObjectInputStream(newSocket.getInputStream());
+
                 CommunicationConnection newConnection = new CommunicationConnection(null, newSocket, myObjInput, myObjOutput, null);
                 Server.allConnections.add(newConnection);
+
+                synchronized (Server.allChannels) {
+                    for (Channel ch : Server.allChannels) {
+                        try {
+                            myObjOutput.writeObject(ch);
+                            myObjOutput.flush();
+                        } catch (Exception e) {
+                            System.out.println("Failed to send history: " + e);
+                        }
+                    }
+                }
 
                 CommunicationIn newClient = new CommunicationIn(guiController, newConnection);
                 Thread perClientThread = new Thread(newClient);
                 perClientThread.start();
             }
         } catch (IOException ex) {
-            System.out.println("ServerConnector broke: " + ex );
+            System.out.println("ServerConnector broke: " + ex);
         }
     }
 }

@@ -3,20 +3,18 @@ package com.example.regret_it;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.stage.FileChooser;
 
-import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class RegretController {
 
@@ -28,20 +26,17 @@ public class RegretController {
     @FXML private TextArea postBodyField;
     @FXML private ComboBox<String> userDropdown;
     @FXML private VBox rankingsBox;
-    @FXML private ImageView logoImageView;
 
-    private ObjectOutputStream myObjOutput;
-    private ObjectInputStream myObjInput;
+    @FXML private Button postFabButton;
+
+    private volatile ObjectOutputStream myObjOutput;
     private String currentUsername = "anonymous";
-
-    private FileChooser fileChooser = new FileChooser();
-    private File selectedFile;
-
-    private Channel currentChannel = null;
+    private final Map<String, HBox> postCardMap = new HashMap<>();
+    private final Map<String, Label> voteLabels = new HashMap<>();
 
     @FXML
     public void initialize() {
-        // Logo loading logic can be placed here if needed
+        if (postFabButton != null) postFabButton.setDisable(true);
     }
 
     @FXML
@@ -53,54 +48,59 @@ public class RegretController {
         userDropdown.getItems().clear();
         userDropdown.getItems().add("u/" + currentUsername);
         userDropdown.getSelectionModel().selectFirst();
-
-        connectToServer();
         usernamePopupOverlay.setVisible(false);
+
+        Thread connectThread = new Thread(() -> connectToServer());
+        connectThread.setDaemon(true);
+        connectThread.start();
     }
 
     private void connectToServer() {
         try {
-            Socket ourSocket = new Socket("10.69.40.225", 5528);
-            myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
-            myObjInput = new ObjectInputStream(ourSocket.getInputStream());
+            Socket ourSocket = new Socket("127.0.0.1", 5528);
+            ObjectOutputStream out = new ObjectOutputStream(ourSocket.getOutputStream());
+            out.flush();
+            ObjectInputStream in = new ObjectInputStream(ourSocket.getInputStream());
+            myObjOutput = out;
+            Platform.runLater(() -> { if (postFabButton != null) postFabButton.setDisable(false); });
 
-            CommunicationConnection newConnection = new CommunicationConnection(currentUsername, ourSocket, myObjInput, myObjOutput, null);
+            CommunicationConnection newConnection = new CommunicationConnection(currentUsername, ourSocket, in, out, null);
 
-            // Start the listener thread - Pass 'this' so it can call onMessageReceived
             CommunicationIn myCommunicationIn = new CommunicationIn(this, newConnection);
             Thread communicationInThread = new Thread(myCommunicationIn);
             communicationInThread.setDaemon(true);
             communicationInThread.start();
 
-            // Notify server of join
-            Message loginMsg = new Message(currentUsername, "Joined", null, null, null, null, null, 1);
-            myObjOutput.writeObject(loginMsg);
-            myObjOutput.flush();
+            Message loginMsg = new Message(currentUsername, "Joined", LocalDateTime.now(), null, 1);
+            out.writeObject(loginMsg);
+            out.flush();
+
         } catch (Exception ex) {
             System.out.println("Socket failed: " + ex);
         }
     }
 
-    // --- RECEIVE LOGIC ---
-
     public void onMessageReceived(Message msg) {
-        // Mode 2 is a post/confession
-        if (msg.getMode() == 2) {
-            Platform.runLater(() -> addChannelCard(msg));
-        }
     }
 
-    public void onThreadReceived(Channel channel) {
-        // Use the message inside the channel to build the card
-        if (channel.getMessage() != null) {
-            Platform.runLater(() -> addChannelCard(channel.getMessage()));
-        }
+    public void onChannelReceived(Channel channel) {
+        Platform.runLater(() -> upsertChannelCard(channel));
     }
 
+    private void upsertChannelCard(Channel channel) {
+        String postId = channel.getPostId();
 
+        if (postId != null && postCardMap.containsKey(postId)) {
+            Label vl = voteLabels.get(postId);
+            if (vl != null) {
+                vl.setText(String.valueOf(channel.getScore()));
+            }
+            return;
+        }
 
-    private void addChannelCard(Message msg) {
-        // 1. Voting Sidebar (Left)
+        Message msg = channel.getMessage();
+        if (msg == null) return;
+
         VBox voteBox = new VBox(5);
         voteBox.setAlignment(Pos.TOP_CENTER);
         voteBox.setMinWidth(44);
@@ -108,15 +108,23 @@ public class RegretController {
 
         Button upBtn = new Button("⇧");
         upBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 18; -fx-text-fill: #878a8c; -fx-cursor: hand;");
-        Label voteLabel = new Label("0");
+
+        Label voteLabel = new Label(String.valueOf(channel.getScore()));
         voteLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12;");
+
         Button downBtn = new Button("↓");
         downBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 18; -fx-text-fill: #878a8c; -fx-cursor: hand;");
+
+        if (postId != null) {
+            voteLabels.put(postId, voteLabel);
+        }
+
+        upBtn.setOnAction(e -> sendVote(channel.getPostId(), "up"));
+        downBtn.setOnAction(e -> sendVote(channel.getPostId(), "down"));
 
         voteBox.getChildren().addAll(upBtn, voteLabel, downBtn);
         VBox.setMargin(upBtn, new Insets(8, 0, 0, 0));
 
-        // 2. Content Area (Right)
         VBox contentBox = new VBox(8);
         contentBox.setPadding(new Insets(8, 12, 8, 12));
         HBox.setHgrow(contentBox, Priority.ALWAYS);
@@ -125,14 +133,13 @@ public class RegretController {
                 ? msg.getTimeStamp().format(DateTimeFormatter.ofPattern("h:mm a"))
                 : LocalDateTime.now().format(DateTimeFormatter.ofPattern("h:mm a"));
 
-        Label metaLabel = new Label("Posted by u/" + msg.getUser() + " • " + time);
+        Label metaLabel = new Label("Posted by u/" + msg.getUser() + "  •  " + time);
         metaLabel.setStyle("-fx-text-fill: #787c7e; -fx-font-size: 12;");
 
         Label bodyLabel = new Label(msg.getMessage());
         bodyLabel.setStyle("-fx-font-size: 16; -fx-font-weight: 500;");
         bodyLabel.setWrapText(true);
 
-        // Footer
         HBox footer = new HBox(15);
         Button commentBtn = new Button("💬 Comments");
         commentBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #878a8c; -fx-font-weight: bold;");
@@ -140,12 +147,33 @@ public class RegretController {
 
         contentBox.getChildren().addAll(metaLabel, bodyLabel, footer);
 
-        // 3. Assemble and Add to Feed
         HBox card = new HBox(voteBox, contentBox);
         card.setStyle("-fx-background-color: white; -fx-background-radius: 4; -fx-border-color: #ccc; -fx-border-radius: 4;");
 
+        if (postId != null) {
+            postCardMap.put(postId, card);
+        }
+
         threadContainer.getChildren().add(0, card);
         updateRankings();
+    }
+
+    private void sendVote(String postId, String voteType) {
+        if (myObjOutput == null || postId == null) return;
+        Thread t = new Thread(() -> {
+            try {
+                Message voteMsg = new Message(currentUsername, voteType, LocalDateTime.now(), null, 4);
+                voteMsg.setPostId(postId);
+                synchronized (myObjOutput) {
+                    myObjOutput.writeObject(voteMsg);
+                    myObjOutput.flush();
+                }
+            } catch (Exception ex) {
+                System.out.println("Vote send failed: " + ex);
+            }
+        });
+        t.setDaemon(true);
+        t.start();
     }
 
     private void updateRankings() {
@@ -158,30 +186,36 @@ public class RegretController {
         }
     }
 
-    // --- SEND LOGIC ---
-
     @FXML
     private void PostThread() {
+        if (myObjOutput == null) return;
         String heading = postHeadingField.getText().trim();
         String body = postBodyField.getText().trim();
         if (heading.isEmpty()) return;
 
         String combinedText = heading + (body.isEmpty() ? "" : "\n" + body);
+        String postId = UUID.randomUUID().toString();
 
-        try {
+        Thread t = new Thread(() -> {
+            try {
+                Message msg = new Message(currentUsername, combinedText, LocalDateTime.now(), null, 2);
+                msg.setPostId(postId);
+                synchronized (myObjOutput) {
+                    myObjOutput.writeObject(msg);
+                    myObjOutput.flush();
+                }
+            } catch (Exception ex) {
+                System.out.println("Post failed: " + ex);
+            }
+        });
+        t.setDaemon(true);
+        t.start();
 
-            Message msg = new Message(currentUsername, combinedText, null, null, null, LocalDateTime.now(), null, 2);
-            myObjOutput.writeObject(msg);
-            myObjOutput.flush();
-            onClosePost();
-        } catch (Exception ex) {
-            System.out.println("Post failed: " + ex);
-        }
+        onClosePost();
     }
 
-    // --- UI HELPERS ---
-
     @FXML private void onOpenPostPopup() { postPopupOverlay.setVisible(true); }
+
     @FXML private void onClosePost() {
         postPopupOverlay.setVisible(false);
         postHeadingField.clear();
@@ -194,20 +228,4 @@ public class RegretController {
     @FXML private void Upvote() {}
     @FXML private void Downvote() {}
     @FXML private void UploadMedia() {}
-    @FXML private void onBellClicked() { System.out.println("Bell clicked"); }
-    @FXML private void FilterThreads() { System.out.println("Filter clicked"); }
-    @FXML private void OpenThread()    { System.out.println("Open thread"); }
-    @FXML private void Upvote()        { System.out.println("Upvote"); }
-    @FXML private void Downvote()      { System.out.println("Downvote"); }
-    @FXML private void UploadMedia()   {
-        fileChooser.setTitle("Open Resource File");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Media Files", "*.png", "*.jpg", "*.jpeg", "*.mp3", "*.mp2")
-        );
-        if (selectedFile != null) {
-
-        }
-        selectedFile = fileChooser.showOpenDialog(null);
-    }
-    @FXML public void onThreadReceived(Channel channel) { System.out.println("Thread Received"); }
 }

@@ -3,6 +3,7 @@ package com.example.regret_it;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class Client {
@@ -11,13 +12,15 @@ public class Client {
             Socket ourSocket = new Socket("127.0.0.1", 5528);
 
             ObjectOutputStream myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
+            myObjOutput.flush();
             ObjectInputStream myObjInput = new ObjectInputStream(ourSocket.getInputStream());
+
             CommunicationConnection newConnection = new CommunicationConnection("Test", ourSocket, myObjInput, myObjOutput, null);
             CommunicationIn myCommunicationIn = new CommunicationIn(null, newConnection);
             Thread communicationInThread = new Thread(myCommunicationIn);
             communicationInThread.start();
 
-            Message message1 = new Message("Tai","Hello",null,null, null, null, null, 1);
+            Message message1 = new Message("Tai", "Hello", LocalDateTime.now(), null, 1);
             myObjOutput.writeObject(message1);
             myObjOutput.flush();
 
@@ -29,13 +32,13 @@ public class Client {
                 if (theText.equalsIgnoreCase("STOP")) {
                     keepScanning = false;
                 } else {
-                    Message newMessage = new Message("Tai", theText, null, null, null, null, null, 2);
+                    Message newMessage = new Message("Tai", theText, LocalDateTime.now(), null, 2);
                     myObjOutput.writeObject(newMessage);
                     myObjOutput.flush();
                 }
             }
 
-            Message message3 = new Message("Tai", "", null, null, null, null, null, 3);
+            Message message3 = new Message("Tai", "", LocalDateTime.now(), null, 3);
             myObjOutput.writeObject(message3);
             myObjOutput.flush();
             communicationInThread.interrupt();

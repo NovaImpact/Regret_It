@@ -19,35 +19,14 @@ public class CommunicationConnection {
         this.channel = channel;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
-    public ObjectInputStream getInStream() {
-        return inStream;
-    }
-
-    public void setInStream(ObjectInputStream inStream) {
-        this.inStream = inStream;
-    }
-
-    public ObjectOutputStream getOutStream() {
-        return outStream;
-    }
-
-    public void setOutStream(ObjectOutputStream outStream) {
-        this.outStream = outStream;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Socket getSocket() { return socket; }
+    public void setSocket(Socket socket) { this.socket = socket; }
+    public ObjectInputStream getInStream() { return inStream; }
+    public void setInStream(ObjectInputStream inStream) { this.inStream = inStream; }
+    public ObjectOutputStream getOutStream() { return outStream; }
+    public void setOutStream(ObjectOutputStream outStream) { this.outStream = outStream; }
+    public Channel getChannel() { return channel; }
+    public void setChannel(Channel channel) { this.channel = channel; }
 }

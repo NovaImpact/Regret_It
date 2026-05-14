@@ -92,7 +92,7 @@
                 </VBox>
             </ScrollPane>
 
-            <Button onAction="#onOpenPostPopup" style="-fx-background-color: #0079D3; -fx-text-fill: white; -fx-font-size: 24; -fx-background-radius: 30; -fx-pref-width: 50; -fx-pref-height: 50;" text="+" StackPane.alignment="BOTTOM_RIGHT">
+            <Button fx:id="postFabButton" onAction="#onOpenPostPopup" style="-fx-background-color: #0079D3; -fx-text-fill: white; -fx-font-size: 24; -fx-background-radius: 30; -fx-pref-width: 50; -fx-pref-height: 50;" text="+" StackPane.alignment="BOTTOM_RIGHT">
                 <StackPane.margin><Insets bottom="30" right="30" /></StackPane.margin>
             </Button>
 
@@ -117,11 +117,11 @@
             <StackPane fx:id="usernamePopupOverlay" style="-fx-background-color: rgba(28,28,28,0.9);">
                 <VBox maxHeight="300" maxWidth="450" spacing="20" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 0);">
                     <VBox alignment="CENTER" spacing="10">
-                  <ImageView fitHeight="209.0" fitWidth="270.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../../../kermit_reddit_logo_blue_sad.png" />
-                     </image>
-                  </ImageView>
+                        <ImageView fitHeight="209.0" fitWidth="270.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../../../kermit_reddit_logo_blue_sad.png" />
+                            </image>
+                        </ImageView>
                         <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #1c1c1c;" text="Welcome to RegretIt" />
                         <Label style="-fx-font-size: 13; -fx-text-fill: #7c7c7c;" text="Enter your username to start confessing." />
                     </VBox>
