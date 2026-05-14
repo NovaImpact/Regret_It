@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Client {
     public static void main(String[] args) {
         try {
-            Socket ourSocket = new Socket("10.69.40.225", 67);
+            Socket ourSocket = new Socket("127.0.0.1", 5528);
 
             ObjectOutputStream myObjOutput = new ObjectOutputStream(ourSocket.getOutputStream());
             ObjectInputStream myObjInput = new ObjectInputStream(ourSocket.getInputStream());
