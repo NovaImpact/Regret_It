@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class RegretController {
 
     private void connectToServer() {
         try {
-            Socket ourSocket = new Socket("10.69.40.225", 5567);
+            Socket ourSocket = new Socket("10.0.0.195", 5567);
             ObjectOutputStream out = new ObjectOutputStream(ourSocket.getOutputStream());
             out.flush();
             ObjectInputStream in = new ObjectInputStream(ourSocket.getInputStream());
@@ -205,7 +206,8 @@ public class RegretController {
         Thread t = new Thread(() -> {
             try {
                 Message msg = new Message(currentUsername, combinedText, LocalDateTime.now(), null, 2);
-                Channel channel = new Channel(msg, heading, new ArrayList<Message>(), 0, 0, new ArrayList<String>(), postId, selectedFile);
+                byte[] mediaData = Files.readAllBytes(selectedFile.toPath());
+                Channel channel = new Channel(msg, heading, new ArrayList<Message>(), 0, 0, new ArrayList<String>(), postId, mediaData, selectedFile.getName());
                 synchronized (myObjOutput) {
                     myObjOutput.writeObject(channel);
                     myObjOutput.flush();
@@ -218,7 +220,6 @@ public class RegretController {
         t.start();
 
         onClosePost();
-        selectedFile = null;
     }
 
     @FXML private void onOpenPostPopup() { postPopupOverlay.setVisible(true); }
@@ -235,6 +236,7 @@ public class RegretController {
     @FXML private void Upvote() {}
     @FXML private void Downvote() {}
     @FXML private void UploadMedia() {
+        selectedFile = null;
         fileChooser.setTitle("Open Resource File");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Media Files", "*.png", "*.jpg", "*.jpeg", "*.mp2", "*.mp3")

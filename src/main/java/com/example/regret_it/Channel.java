@@ -14,9 +14,10 @@ public class Channel implements Serializable {
     private int downVote;
     private ArrayList<String> tags = new ArrayList<>();
     private String postId;
-    private File file;
+    private byte[] fileData;
+    private String fileName;
 
-    public Channel(Message message, String heading, ArrayList<Message> responses, int upVote, int downVote, ArrayList<String> tags, String postId, File file) {
+    public Channel(Message message, String heading, ArrayList<Message> responses, int upVote, int downVote, ArrayList<String> tags, String postId, byte[] fileData, String fileName) {
         this.message = message;
         this.heading = heading;
         this.responses = responses != null ? responses : new ArrayList<>();
@@ -24,7 +25,8 @@ public class Channel implements Serializable {
         this.downVote = downVote;
         this.tags = tags != null ? tags : new ArrayList<>();
         this.postId = postId;
-        this.file = file;
+        this.fileData = fileData;
+        this.fileName = fileName;
     }
 
     public Message getMessage() { return message; }
@@ -41,12 +43,11 @@ public class Channel implements Serializable {
     public void setTags(ArrayList<String> tags) { this.tags = tags; }
     public String getPostId() { return postId; }
     public void setPostId(String postId) { this.postId = postId; }
-    public File getFile() {
-        return file;
+    public byte[] getFileData() {
+        return fileData;
     }
-
-    public void setFile(File file) {
-        this.file = file;
+    public String getFileName() {
+        return fileName;
     }
 
     public int getScore() { return upVote - downVote; }
@@ -61,7 +62,8 @@ public class Channel implements Serializable {
                 ", downVote=" + downVote +
                 ", tags=" + tags +
                 ", postId='" + postId + '\'' +
-                ", file=" + file +
+                ", fileData=" + fileData.toString() +
+                ", fileName='" + fileName + '\'' +
                 '}';
     }
 }
