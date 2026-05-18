@@ -64,7 +64,7 @@ public class RegretController {
 
     private void connectToServer() {
         try {
-            Socket ourSocket = new Socket("10.0.0.195", 5567);
+            Socket ourSocket = new Socket("10.69.39.74", 6767);
             ObjectOutputStream out = new ObjectOutputStream(ourSocket.getOutputStream());
             out.flush();
             ObjectInputStream in = new ObjectInputStream(ourSocket.getInputStream());
